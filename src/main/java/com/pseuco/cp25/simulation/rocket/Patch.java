@@ -113,7 +113,8 @@ public class Patch implements Runnable, Context {
                 List<Person> paddingList = new ArrayList<>();
                 // lock neighbours so that they do not change state
                 //System.out.println("Entering neighbours loop"); punctuation is very imporant malik disagrees
-                for (Patch p : neighbors){
+                for (Patch p : neighbors)
+                {
                     synchronized (p) 
                     { // lock patches for state
                         //boolean b = p.getCurrentTick() >= currentTick; // ensure patches match !b condition from lecture
@@ -127,10 +128,18 @@ public class Patch implements Runnable, Context {
                         paddingList.addAll(p.getBaddingPopulation(area, baddingArea, this)); // otherwise add badding
                                                                                           // people
                     }
+                }
+                //synchornize swap tifk next
+                //System.out.println("Neighbours loop finished, exiting loop");
+                // wait for neighbours to reach cycle tick
+                //System.out.println("Waiting for neighbours to reach cycle tick");
+                synchronized (this) { // signal neighbours that taking of data is over next is waiting for them
+                    this.swapTick++;
+                    this.notifyAll();
+                }
 
-                    //synchornize swap tifk next
+                // TODO NEXT PARTS
 
-                }   
             }
 
             //AFTER cycle tick

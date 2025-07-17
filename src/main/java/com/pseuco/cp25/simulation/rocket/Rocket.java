@@ -1,16 +1,20 @@
 package com.pseuco.cp25.simulation.rocket;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.pseuco.cp25.model.Output;
+import com.pseuco.cp25.model.PersonInfo;
+import com.pseuco.cp25.model.Query;
 import com.pseuco.cp25.model.Rectangle;
 import com.pseuco.cp25.model.Scenario;
 import com.pseuco.cp25.model.Statistics;
 import com.pseuco.cp25.model.TraceEntry;
+import com.pseuco.cp25.model.XY;
 import com.pseuco.cp25.simulation.common.Simulation;
 import com.pseuco.cp25.validator.InsufficientPaddingException;
 import com.pseuco.cp25.validator.Validator;
@@ -75,7 +79,26 @@ public class Rocket implements Simulation
 
     @Override
     public void run() {
-        throw new RuntimeException("not implemented");
+
+        PopulationImp output = new PopulationImp(
+        scenario.getTrace(),
+        scenario.getTicks(),
+        scenario.getPopulation().size(),
+        scenario.getQueries().values()
+        );
+        //call threads here incomplete now
+
+        //THREADS FUNC
+
+        if (scenario.getTrace()) 
+        {
+             // Store trace entries
+            //finish rest of this to get num infected etc output ddeets
+        } else {
+            Map<Query, Statistics[]> stats = output.getStats();
+            //finish rest of run
+        }
+
     }
 
     private int infectionUncertainity() 
@@ -117,15 +140,64 @@ public class Rocket implements Simulation
         //System.out.println("initializeStatistics completed");
     }
 
-    private void threads(){
+    private void threads(PopulationImp output){
         //THREAD stuff
+       
         List<Patch> patchList = new ArrayList<>();
 
         Iterator<Rectangle> patchAreas = Utils.getPatches(scenario);
+        int patchId = 0;
+
+        while (patchAreas.hasNext()) {
+            Rectangle patchArea = patchAreas.next(); // get za patch
+            XY TL1 = patchArea.getTopLeft(); // top left corner of the patch starting point
+            XY TL2 = TL1.sub(badding); // now add padding to the core of the patch
+            XY BR = scenario.getGrid().getBottomRight(); // now find the bottom right corner of the grid
+            XY TL3 = TL2.limit(XY.ZERO, BR); // limit the top left corner to the grid size
+            XY sizeOfPatch = patchArea.getBottomRight().add(badding).limit(XY.ZERO, BR).sub(TL3);
+            Rectangle paddingArea = new Rectangle(TL3, sizeOfPatch); // now create the padding area
+
+            Patch patch = new Patch(
+                    patchId, 
+                    scenario.getTicks(),
+                    cycleOfTicks,
+                    scenario.getParameters(), 
+                    scenario.getGrid(), 
+                    patchArea, 
+                    paddingArea, 
+                    scenario.getObstacles(), 
+                    scenario.getQueries(), 
+                    scenario.getPopulation(), 
+                    validator, 
+                    output , 
+                    scenario.getTrace()
+                    );
+            patchList.add(patch); // add the patch to the list of patches
+            patchId++;
+        }
+
+
+
+        //Initialize neighbourds logic 
+
+
     }
 
-
-
-
+    private void startAndJoinThreads(List<Patch> patchList){
+        // start all patch threads and join
+        List<Thread> threads = new ArrayList<>(); 
+        for (Patch patch : patchList) {
+            Thread thread = new Thread(patch);
+            threads.add(thread);
+            thread.start(); 
+        }
+        
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException exception) {
+            }
+        }
+    }
 
 }

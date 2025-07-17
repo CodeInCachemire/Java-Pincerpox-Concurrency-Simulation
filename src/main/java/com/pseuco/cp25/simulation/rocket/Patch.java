@@ -99,6 +99,7 @@ public class Patch implements Runnable, Context {
         }
         
         //Maybe need to add something for output here
+
     }
 
     @Override
@@ -107,6 +108,29 @@ public class Patch implements Runnable, Context {
             //REST OF IMP
             if (currentTick % cycleOfTicks == 0) {
 
+                //System.out.println("Inside cycle ticks");
+                // Store badding people from other patches in temp list
+                List<Person> paddingList = new ArrayList<>();
+                // lock neighbours so that they do not change state
+                //System.out.println("Entering neighbours loop"); punctuation is very imporant malik disagrees
+                for (Patch p : neighbors){
+                    synchronized (p) 
+                    { // lock patches for state
+                        //boolean b = p.getCurrentTick() >= currentTick; // ensure patches match !b condition from lecture
+                        while (!(p.getCurrentTick() >= currentTick)) 
+                        {
+                            try {
+                                p.wait(); // wait if condiiton is not matched
+                            } catch (InterruptedException exc) { // exception
+                            }
+                        }
+                        paddingList.addAll(p.getBaddingPopulation(area, baddingArea, this)); // otherwise add badding
+                                                                                          // people
+                    }
+
+                    //synchornize swap tifk next
+
+                }   
             }
 
             //AFTER cycle tick
@@ -142,4 +166,31 @@ public class Patch implements Runnable, Context {
     public int getId() {
         return id;
     }
+
+    public synchronized int getCurrentTick() {
+        return this.currentTick;
+    }
+
+    public synchronized int getSwapTick() {
+        return this.swapTick;
+    }
+
+    public void addNeighborToPatch(Patch patch) {
+        this.neighbors.add(patch);
+
+    }
+
+    public synchronized List<Person> getBaddingPopulation(Rectangle area, Rectangle baddingArea, Patch batch) {
+        //System.out.println("Concurrency check for padding population");
+        List<Person> listOfPeople = new ArrayList<>();
+        for (Person person : population) {
+            if (!area.contains(person.getPosition()) && baddingArea.contains(person.getPosition())) {
+                listOfPeople.add(person.clone(batch));
+            }
+        }
+        //System.out.println("Concurrency check for padding population finished");
+        return listOfPeople;
+    }
+
+
 }

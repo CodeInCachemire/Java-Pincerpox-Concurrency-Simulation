@@ -138,8 +138,11 @@ public class Patch implements Runnable, Context {
                     this.notifyAll();
                 }
 
-                // TODO NEXT PARTS
+                // TODO NEXT
 
+
+                // now we can add padding list to our population
+                population.addAll(paddingList);
             }
 
             //AFTER cycle tick

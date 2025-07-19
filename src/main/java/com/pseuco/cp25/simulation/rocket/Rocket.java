@@ -1,14 +1,12 @@
 package com.pseuco.cp25.simulation.rocket;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.pseuco.cp25.model.Output;
-import com.pseuco.cp25.model.PersonInfo;
 import com.pseuco.cp25.model.Query;
 import com.pseuco.cp25.model.Rectangle;
 import com.pseuco.cp25.model.Scenario;
@@ -18,6 +16,7 @@ import com.pseuco.cp25.model.XY;
 import com.pseuco.cp25.simulation.common.Simulation;
 import com.pseuco.cp25.validator.InsufficientPaddingException;
 import com.pseuco.cp25.validator.Validator;
+import static com.pseuco.cp25.simulation.common.Utils.mayPropagateFrom;
 
 /**
  * Your implementation shall go into this class.
@@ -87,7 +86,7 @@ public class Rocket implements Simulation
         scenario.getQueries().values()
         );
         //call threads here incomplete now
-
+        threads(output);
         //THREADS FUNC
 
         if (scenario.getTrace()) 
@@ -176,8 +175,29 @@ public class Rocket implements Simulation
             patchId++;
         }
 
+        for (int i = 0; i < patchList.size(); i++) {
+            Patch patchOne = patchList.get(i);
+            Iterator<Rectangle> otherPatch = Utils.getPatches(scenario);
+            int otherPatchId = -1;
 
+            while (otherPatch.hasNext()) {
+                Rectangle otherArea = otherPatch.next();
+                otherPatchId++;
+                if (i == otherPatchId) {
+                    continue; // skip the patch itself
+                }
 
+                Patch patchTwoID = patchList.get(otherPatchId);
+                if (patchOne.getBaddingArea().overlaps(otherArea)
+                        && mayPropagateFrom(scenario, patchOne.getArea(), otherArea)) {
+                    patchOne.addNeighborToPatch(patchTwoID); //add nieghbor patfch to our neighbiur patches
+                }
+
+            }
+
+        }
+        
+        startAndJoinThreads(patchList);
         //Initialize neighbourds logic 
 
 

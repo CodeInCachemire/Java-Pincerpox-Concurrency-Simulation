@@ -106,7 +106,8 @@ public class Patch implements Runnable, Context {
     public void run() {
         while(currentTick < ticks){
             //REST OF IMP
-            if (currentTick % cycleOfTicks == 0) {
+            if (currentTick % cycleOfTicks == 0) 
+            {
 
                 //System.out.println("Inside cycle ticks");
                 // Store badding people from other patches in temp list
@@ -138,15 +139,29 @@ public class Patch implements Runnable, Context {
                     this.notifyAll();
                 }
 
-                // TODO NEXT
-
-
+                //System.out.println("Neighbours reached cycle tick, now adding padding people");
+                // now we wait for all patches to reach to finish gathering their own respective badding
+                // people
+                for (Patch p : neighbors) {
+                    synchronized (p) 
+                    {
+                        //boolean b = p.getSwapTick() >= this.swapTick; // ensure patches match !b condition from lecture
+                        while (!(p.getSwapTick() >= this.swapTick)) 
+                        { // wait for all patches to reach the same tick
+                            try {
+                                p.wait();
+                            } catch (InterruptedException exception) {
+                            }
+                        }
+                    }
+                }
+                //System.out.println("All patches reached cycle tick, now adding padding people");
                 // now we can add padding list to our population
-                population.addAll(paddingList);
+                population.addAll(paddingList); //سورت
             }
 
             //AFTER cycle tick
-
+            runSlugStuff(); 
             //BEFORE Loop end
 
         }
@@ -202,6 +217,42 @@ public class Patch implements Runnable, Context {
         }
         //System.out.println("Concurrency check for padding population finished");
         return listOfPeople;
+    }
+
+    private void runSlugStuff(){
+
+        validator.onPatchTick(currentTick, id);
+            // code from slug
+            for (Person person : population) {
+                // if this were a patch, the `onPersonTick` method should be called here
+                validator.onPersonTick(currentTick, id, person.getId());
+                person.tick();
+            }
+
+            // bust the ghosts of all persons
+            this.population.stream().forEach(Person::bustGhost);
+
+            // now compute how the infection spreads between the population
+            for (int i = 0; i < this.population.size(); i++) {
+                for (int j = i + 1; j < this.population.size(); j++) {
+                    final Person iPerson = this.population.get(i);
+                    final Person jPerson = this.population.get(j);
+                    final XY iPosition = iPerson.getPosition();
+                    final XY jPosition = jPerson.getPosition();
+                    final int deltaX = Math.abs(iPosition.getX() - jPosition.getX());
+                    final int deltaY = Math.abs(iPosition.getY() - jPosition.getY());
+                    final int distance = deltaX + deltaY;
+                    if (distance <= infectionRadius) {
+                        if (iPerson.isInfectious() && iPerson.isCoughing() && jPerson.isBreathing()) {
+                            jPerson.infect();
+                        }
+                        if (jPerson.isInfectious() && jPerson.isCoughing() && iPerson.isBreathing()) {
+                            iPerson.infect();
+                        }
+                    }
+                }
+            }
+
     }
 
 

@@ -97,6 +97,7 @@ public class Rocket implements Simulation
             //finish rest of this to get num infected etc output ddeets
             for (PersonInfo[] tr : output.getTrace()) {
             this.trace.add(new TraceEntry(Arrays.asList(tr)));
+            long sus = 0, inf = 0, infe = 0, rec = 0;
         }
         } else {
             Map<Query, Statistics[]> stats = output.getStats();

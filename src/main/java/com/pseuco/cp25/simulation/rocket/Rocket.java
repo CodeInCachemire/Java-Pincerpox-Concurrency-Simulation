@@ -1,12 +1,14 @@
 package com.pseuco.cp25.simulation.rocket;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.pseuco.cp25.model.Output;
+import com.pseuco.cp25.model.PersonInfo;
 import com.pseuco.cp25.model.Query;
 import com.pseuco.cp25.model.Rectangle;
 import com.pseuco.cp25.model.Scenario;
@@ -93,6 +95,9 @@ public class Rocket implements Simulation
         {
              // Store trace entries
             //finish rest of this to get num infected etc output ddeets
+            for (PersonInfo[] tr : output.getTrace()) {
+            this.trace.add(new TraceEntry(Arrays.asList(tr)));
+        }
         } else {
             Map<Query, Statistics[]> stats = output.getStats();
             //finish rest of run

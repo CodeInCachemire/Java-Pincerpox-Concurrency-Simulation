@@ -104,7 +104,8 @@ public class Patch implements Runnable, Context {
 
     @Override
     public void run() {
-        while(currentTick < ticks){
+        while(currentTick < ticks)
+        {
             //REST OF IMP
             if (currentTick % cycleOfTicks == 0) 
             {
@@ -158,11 +159,36 @@ public class Patch implements Runnable, Context {
                 //System.out.println("All patches reached cycle tick, now adding padding people");
                 // now we can add padding list to our population
                 population.addAll(paddingList); //سورت
+
             }
 
             //AFTER cycle tick
             runSlugStuff(); 
             //BEFORE Loop end
+            if ((currentTick + 1) % cycleOfTicks != 0) {
+                // if the current tick is not a cycle tick, we just add the people that are in the core
+                // area and pass it to output
+                List<Person> list = new ArrayList<>();
+                for (Person person : population) {
+                    if (area.contains(person.getPosition())) {
+                        list.add(person);
+                    }
+                }
+                currentTick++;
+            } else {
+                synchronized (this) { // synchronize the patch to remove people that are not in the core area
+                    // all padding people are removed from the population
+                    List<Person> removeList = new ArrayList<>();
+                    for (Person person : population) {
+                        if (!area.contains(person.getPosition())) {
+                            removeList.add(person);
+                        }
+                    }
+                    population.removeAll(removeList); // remove all people that are not in the are in the core
+                    currentTick++; // increment current tick
+                    notifyAll(); // notify all waiting threads
+                }
+            }
 
         }
     }

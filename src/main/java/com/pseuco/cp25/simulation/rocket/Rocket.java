@@ -102,6 +102,12 @@ public class Rocket implements Simulation
         } else {
             Map<Query, Statistics[]> stats = output.getStats();
             //finish rest of run
+            for (int i = 0; i <= scenario.getTicks(); i++) {
+                for (Map.Entry<String, Query> entry : scenario.getQueries().entrySet()) {
+                    final Statistics[] statistacs = stats.get(entry.getValue());
+                    this.statistics.get(entry.getKey()).add(statistacs[i]);
+                }
+            }
         }
 
     }

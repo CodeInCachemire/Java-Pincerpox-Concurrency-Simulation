@@ -48,8 +48,15 @@ public class PopulationImp {
     public void addPopulationStat(List<Person> people, Query query, int tick) {
         if (!traceEnabled) {
             long sus = 0, inf = 0, infe = 0, rec = 0;
-
             //to od  rest
+            for (Person p : people) {
+                if (p.isSusceptible()) sus++;
+                else if (p.isInfected()) inf++;
+                else if (p.isInfectious()) infe++;
+                else rec++;
+            }
+
+            stats.get(query)[tick] = new Statistics(sus, inf, infe, rec);
         }
     }
 

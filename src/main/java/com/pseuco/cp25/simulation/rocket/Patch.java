@@ -100,7 +100,7 @@ public class Patch implements Runnable, Context {
         
         //Maybe need to add something for output here
         outputAdd(this.population, 0);
-        //System.out.println("Finshed constructor");
+        //System.out.println("Finshed constructor");.
 
 
     }

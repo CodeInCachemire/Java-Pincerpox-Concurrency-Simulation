@@ -34,7 +34,7 @@ public class PopulationImp {
         }
     }
 
-    //TRACE STATISTICS only
+    //TRACE STATISTICS only.
     public void addPopulation(List<Person> people, int tick) {
         if (traceEnabled) {
             for (Person p : people) {

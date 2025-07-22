@@ -78,38 +78,55 @@ public class Rocket implements Simulation
         return new Output(scenario, trace, statistics);
     }
 
-    @Override
-    public void run() {
-
+@Override
+    public void run() 
+    {
         PopulationImp output = new PopulationImp(
         scenario.getTrace(),
         scenario.getTicks(),
         scenario.getPopulation().size(),
         scenario.getQueries().values()
-        );
-        //call threads here incomplete now
-        threads(output);
-        //THREADS FUNC
+    );
 
-        if (scenario.getTrace()) 
-        {
-             // Store trace entries
+    //call threads here incomplete now
+    threads(output);
+    //THREADS FUNC
+    if (scenario.getTrace()) {
+        // Store trace entries
             //finish rest of this to get num infected etc output ddeets
-            for (PersonInfo[] tr : output.getTrace()) {
+        for (PersonInfo[] tr : output.getTrace()) {
             this.trace.add(new TraceEntry(Arrays.asList(tr)));
-            long sus = 0, inf = 0, infe = 0, rec = 0;
         }
-        } else {
-            Map<Query, Statistics[]> stats = output.getStats();
-            //finish rest of run
-            for (int i = 0; i <= scenario.getTicks(); i++) {
-                for (Map.Entry<String, Query> entry : scenario.getQueries().entrySet()) {
-                    final Statistics[] statistacs = stats.get(entry.getValue());
-                    this.statistics.get(entry.getKey()).add(statistacs[i]);
+
+        for (PersonInfo[] gtrace : output.getTrace()) {
+            for (Map.Entry<String, Query> entry : scenario.getQueries().entrySet()) {
+                final Query query = entry.getValue();
+                long sus = 0, inf = 0, infe = 0, rec = 0;
+                for (PersonInfo info : gtrace) {
+                    if (query.getArea().contains(info.getPosition())) {
+                        switch (info.getInfectionState().getState()) {
+                            case SUSCEPTIBLE -> sus++;
+                            case INFECTED    -> inf++;
+                            case INFECTIOUS  -> infe++;
+                            case RECOVERED   -> rec++;
+                        }
+                    }
                 }
+                this.statistics.get(entry.getKey())
+                    .add(new Statistics(sus, inf, infe, rec));
             }
         }
-
+    } else {
+        Map<Query, Statistics[]> stats = output.getStats();
+        //finish rest of run
+        for (int i = 0; i <= scenario.getTicks(); i++) {
+            for (Map.Entry<String, Query> entry : scenario.getQueries().entrySet()) {
+                final Statistics[] statistacs = stats.get(entry.getValue());
+                this.statistics.get(entry.getKey()).add(statistacs[i]);
+            }
+        }
+    }
+            
     }
 
     private int infectionUncertainity() 

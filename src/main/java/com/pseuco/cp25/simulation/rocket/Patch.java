@@ -99,6 +99,9 @@ public class Patch implements Runnable, Context {
         }
         
         //Maybe need to add something for output here
+        outputAdd(this.population, 0);
+        //System.out.println("Finshed constructor");
+
 
     }
 
@@ -159,13 +162,15 @@ public class Patch implements Runnable, Context {
                 //System.out.println("All patches reached cycle tick, now adding padding people");
                 // now we can add padding list to our population
                 population.addAll(paddingList); //سورت
-
+                //from the forum we need this shi
+                population.sort(new Person.PersonIDComparator());
             }
 
             //AFTER cycle tick
             runSlugStuff(); 
             //BEFORE Loop end
-            if ((currentTick + 1) % cycleOfTicks != 0) {
+            if ((currentTick + 1) % cycleOfTicks != 0) 
+            {
                 // if the current tick is not a cycle tick, we just add the people that are in the core
                 // area and pass it to output
                 List<Person> list = new ArrayList<>();
@@ -174,6 +179,7 @@ public class Patch implements Runnable, Context {
                         list.add(person);
                     }
                 }
+                outputAdd(list,currentTick+1); // add output method
                 currentTick++;
             } else {
                 synchronized (this) { // synchronize the patch to remove people that are not in the core area
@@ -185,6 +191,7 @@ public class Patch implements Runnable, Context {
                         }
                     }
                     population.removeAll(removeList); // remove all people that are not in the are in the core
+                    outputAdd(population, currentTick+1); // TODO: add output method
                     currentTick++; // increment current tick
                     notifyAll(); // notify all waiting threads
                 }
@@ -279,6 +286,26 @@ public class Patch implements Runnable, Context {
                 }
             }
 
+    }
+
+    private void outputAdd(List<Person> population, int ticK) {
+
+        if(traceEnabled){
+            output.addPopulation(population, ticK);
+        }else {
+            for(Query query : this.queries){
+                List<Person> peopleInQuery = new ArrayList<>();
+                for (Person person :population){
+                    if(query.getArea().contains(person.getPosition()))
+                    peopleInQuery.add(person);
+                }
+
+                if(!peopleInQuery.isEmpty()){
+                    output.addPopulationStat(peopleInQuery, query, ticK);
+                }
+            }
+            
+        }
     }
 
 

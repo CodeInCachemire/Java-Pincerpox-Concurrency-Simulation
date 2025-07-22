@@ -55,7 +55,6 @@ public class PopulationImp {
                 else if (p.isInfectious()) infe++;
                 else rec++;
             }
-
             stats.get(query)[tick] = new Statistics(sus, inf, infe, rec);
         }
     }

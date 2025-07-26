@@ -29,9 +29,9 @@ public class Trace implements Population {
 
     @Override
     public synchronized void addPop(List<Person> population, int tick) {
-        population.stream().forEach(person -> {
-            populations.get(tick)[person.getId()] = person.getInfo();
-        });
+        for (Person person : population) {
+        populations.get(tick)[person.getId()] = person.getInfo();
+        }
     }
 
     @Override

@@ -64,11 +64,11 @@ public class Statistic implements Population {
     public Statistic(int numTicks, Collection<Query> queries) {
         this.stats = new HashMap<>(queries.size());
         for (Query query : queries) {
-            Per_tick[] quadruples = new Per_tick[numTicks + 1];
+            Per_tick[] per_ticks = new Per_tick[numTicks + 1];
             for (int i = 0; i <= numTicks; i++) {
-                quadruples[i] = new Per_tick();
+                per_ticks[i] = new Per_tick();
             }
-            stats.put(query, quadruples);
+            stats.put(query, per_ticks);
         }
     }
 

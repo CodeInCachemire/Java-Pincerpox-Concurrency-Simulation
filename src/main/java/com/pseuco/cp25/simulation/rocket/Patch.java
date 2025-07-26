@@ -28,7 +28,7 @@ public class Patch implements Runnable, Context {
     final private List<Patch> neighbors = new ArrayList<>();
     final private boolean traceEnabled;
     //final private Populations output;
-    final private PopulationImp output;
+    final private Population output;
 
     final private Rectangle grid;
     final private Rectangle area;
@@ -66,7 +66,7 @@ public class Patch implements Runnable, Context {
             Map<String, Query> queries,
             List<PersonInfo> population,
             Validator validator,
-            PopulationImp output,
+            Population output,
             boolean traceEnabled) { // output and trace to be
                                    // added later
         this.id = id;
@@ -291,7 +291,7 @@ public class Patch implements Runnable, Context {
     private void outputAdd(List<Person> population, int ticK) {
 
         if(traceEnabled){
-            output.addPopulation(population, ticK);
+            output.addPop(population, ticK);
         }else {
             for(Query query : this.queries){
                 List<Person> peopleInQuery = new ArrayList<>();
@@ -301,7 +301,7 @@ public class Patch implements Runnable, Context {
                 }
 
                 if(!peopleInQuery.isEmpty()){
-                    output.addPopulationStat(peopleInQuery, query, ticK);
+                    output.addPopStat(peopleInQuery, query, ticK);
                 }
             }
             

@@ -16,6 +16,7 @@ import com.pseuco.cp25.model.Statistics;
 import com.pseuco.cp25.model.TraceEntry;
 import com.pseuco.cp25.model.XY;
 import com.pseuco.cp25.simulation.common.Simulation;
+import com.pseuco.cp25.simulation.rocket.Statistic.Per_tick;
 import com.pseuco.cp25.validator.InsufficientPaddingException;
 import com.pseuco.cp25.validator.Validator;
 import static com.pseuco.cp25.simulation.common.Utils.mayPropagateFrom;
@@ -81,25 +82,21 @@ public class Rocket implements Simulation
 @Override
     public void run() 
     {
-        PopulationImp output = new PopulationImp(
-        scenario.getTrace(),
-        scenario.getTicks(),
-        scenario.getPopulation().size(),
-        scenario.getQueries().values()
-        );
+        
 
         //call threads here incomplete now
         //threads(output);
         //THREADS FUNC
         if (scenario.getTrace()) {
             // Store trace entries
+            Population output = new Trace(scenario.getTicks(), scenario.getPopulation().size());
             threads(output);
                 //finish rest of this to get num infected etc output ddeets
-            for (PersonInfo[] tr : output.getTrace()) {
+            for (PersonInfo[] tr : output.getPop()) {
                 this.trace.add(new TraceEntry(Arrays.asList(tr)));
             }
 
-            for (PersonInfo[] gtrace : output.getTrace()) {
+            for (PersonInfo[] gtrace : output.getPop()) {
                 for (Map.Entry<String, Query> entry : scenario.getQueries().entrySet()) {
                     final Query query = entry.getValue();
                     long sus = 0, inf = 0, infe = 0, rec = 0;
@@ -118,13 +115,18 @@ public class Rocket implements Simulation
                 }
             }
         } else {
+            Population output = new Statistic(scenario.getTicks(), scenario.getQueries().values());
             threads(output);
-            Map<Query, Statistics[]> stats = output.getStats();
+            Map<Query, Per_tick[]> stats = output.getStats();
             //finish rest of run
             for (int i = 0; i <= scenario.getTicks(); i++) {
-                for (Map.Entry<String, Query> entry : scenario.getQueries().entrySet()) {
-                    final Statistics[] statistacs = stats.get(entry.getValue());
-                    this.statistics.get(entry.getKey()).add(statistacs[i]);
+                for (Map.Entry<String, Query> entry : this.scenario.getQueries().entrySet()) {
+                    final Per_tick[] per_ticks = stats.get(entry.getValue());
+                    this.statistics.get(entry.getKey())
+                            .add(new Statistics(per_ticks[i].getNumSus(),
+                                    per_ticks[i].getNumInf(),
+                                    per_ticks[i].getNumInfectious(),
+                                    per_ticks[i].getNumRecov()));
                 }
             }
         }
@@ -170,7 +172,7 @@ public class Rocket implements Simulation
         //System.out.println("initializeStatistics completed");
     }
 
-    private void threads(PopulationImp output)
+    private void threads(Population output)
     {
         //THREAD stuff
        

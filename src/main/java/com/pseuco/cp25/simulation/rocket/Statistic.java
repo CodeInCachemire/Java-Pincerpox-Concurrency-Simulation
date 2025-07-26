@@ -14,11 +14,8 @@ public class Statistic implements Population {
     
     public class Per_tick {
 
-        private long numSus = 0;
-        private long numInf = 0;
-        private long numInfect = 0;
-        private long numRecov = 0;
-
+        private long numSus = 0; private long numInf = 0; private long numInfect = 0; private long numRecov = 0;
+        
         public long getNumSus() {
             return numSus;
         }
@@ -35,14 +32,6 @@ public class Statistic implements Population {
             return numRecov;
         }
 
-        public void addSus() {
-            numSus++;
-        }
-
-        public void addInf() {
-            numInf++;
-        }
-
         public void addInfectious() {
             numInfect++;
         }
@@ -51,21 +40,32 @@ public class Statistic implements Population {
             numRecov++;
         }
 
+        public void addSus() {
+            numSus++;
+        }
+
+        public void addInf() {
+            numInf++;
+        }
+
+        
+
     }
 
     private final Map<Query, Per_tick[]> stats;
-
     /**
-     * Initialize an array of quadruples for each query given.
-     * 
-     * @param numTicks Number of all ticks
-     * @param queries  The queries specified in the scenario
+     * Constructs a Statistic object that will hold 
+     * statistics for the given number of ticks and queries.
+     *
+     * @param ticksNum The number of ticks to simulate.
+     * @param queries  The collection of queries for which statistics are to be collected.
      */
-    public Statistic(int numTicks, Collection<Query> queries) {
+    
+    public Statistic(int ticksNum, Collection<Query> queries) {
         this.stats = new HashMap<>(queries.size());
         for (Query query : queries) {
-            Per_tick[] per_ticks = new Per_tick[numTicks + 1];
-            for (int i = 0; i <= numTicks; i++) {
+            Per_tick[] per_ticks = new Per_tick[ticksNum + 1];
+            for (int i = 0; i <= ticksNum; i++) {
                 per_ticks[i] = new Per_tick();
             }
             stats.put(query, per_ticks);

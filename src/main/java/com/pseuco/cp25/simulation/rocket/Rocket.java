@@ -82,9 +82,7 @@ public class Rocket implements Simulation
 @Override
     public void run() 
     {
-        
-
-        //call threads here incomplete now
+        //call threads here incomplete noww
         //threads(output);
         //THREADS FUNC
         if (scenario.getTrace()) {

@@ -11,10 +11,13 @@ import com.pseuco.cp25.simulation.common.Person;
 
 public class Statistic implements Population {
 
-    
+    /*this shows statistics per tick for each query and 
+    it is a map from query to an array of Per_tick objects so each Per_tick 
+    contains the number of susc, infected, infectious, and recov persons */ 
     public class Per_tick {
 
-        private long numSus = 0; private long numInf = 0; private long numInfect = 0; private long numRecov = 0;
+        private long numSus = 0; private long numInf = 0; private long numInfect = 0; 
+        private long numRecov = 0;
         
         public long getNumSus() {
             return numSus;
@@ -66,15 +69,10 @@ public class Statistic implements Population {
         for (Query query : queries) {
             Per_tick[] per_ticks = new Per_tick[ticksNum + 1];
             for (int i = 0; i <= ticksNum; i++) {
-                per_ticks[i] = new Per_tick();
+                per_ticks[i] = new Per_tick(); // initialize each Per_tick to not be null
             }
             stats.put(query, per_ticks);
         }
-    }
-
-    @Override
-    public void addPop(List<Person> population, int tick) {
-        throw new UnsupportedOperationException("Unimplemented method 'addPopulationStat'");
     }
 
     @Override
@@ -90,6 +88,11 @@ public class Statistic implements Population {
                 stats.get(query)[tick].addRecov();
             }
         }
+    }
+
+    @Override
+    public void addPop(List<Person> population, int tick) {
+        throw new UnsupportedOperationException("Unimplemented method 'addPopulationStat'");
     }
 
     @Override

@@ -35,7 +35,7 @@ public class PopulationImp {
     }
 
     //TRACE STATISTICS only.
-    public void addPopulation(List<Person> people, int tick) {
+    public synchronized void addPopulation(List<Person> people, int tick) {
         if (traceEnabled) {
             for (Person p : people) {
                 traceList.get(tick)[p.getId()] = p.getInfo();
@@ -45,7 +45,7 @@ public class PopulationImp {
 
 
     //POPSTATS NORMAL not trrace
-    public void addPopulationStat(List<Person> people, Query query, int tick) {
+    public synchronized void addPopulationStat(List<Person> people, Query query, int tick) {
         if (!traceEnabled) {
             long sus = 0, inf = 0, infe = 0, rec = 0;
             //to od  rest

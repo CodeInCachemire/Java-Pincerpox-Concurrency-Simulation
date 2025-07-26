@@ -27,14 +27,13 @@ public class Patch implements Runnable, Context {
     final private List<Person> population;
     final private List<Patch> neighbors = new ArrayList<>();
     final private boolean traceEnabled;
-    //final private Populations output;
     final private Population output;
 
     final private Rectangle grid;
     final private Rectangle area;
     final private Rectangle baddingArea;
 
-    // may need to add some stuff for statistacs
+    
     final private Validator validator;
     private int currentTick = 0;
     private int swapTick = 0;
@@ -118,7 +117,7 @@ public class Patch implements Runnable, Context {
                 List<Person> paddingList = new ArrayList<>();
                 // lock neighbours so that they do not change state
                 //System.out.println("Entering neighbours loop"); punctuation is very imporant malik disagrees
-                for (Patch p : neighbors)
+                for (Patch p : neighbors)// barrier 
                 {
                     synchronized (p) 
                     { // lock patches for state
@@ -191,7 +190,7 @@ public class Patch implements Runnable, Context {
                         }
                     }
                     population.removeAll(removeList); // remove all people that are not in the are in the core
-                    outputAdd(population, currentTick+1); // TODO: add output method
+                    outputAdd(population, currentTick+1); // 
                     currentTick++; // increment current tick
                     notifyAll(); // notify all waiting threads
                 }

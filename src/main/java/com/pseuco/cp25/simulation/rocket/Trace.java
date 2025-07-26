@@ -14,15 +14,15 @@ public class Trace implements Population {
     private final List<PersonInfo[]> populations;
 
     /**
-     * Initialize the number of arrays necessary to capture all PersonInfos throughout the
-     * simulation.
+     * Constructs a Trace object that will 
+     * hold the population of each tick.
      * 
-     * @param numTicks   Number of all ticks
-     * @param numPersons Number of people in the grid
+     * @param ticksNum  The number of ticks in the simulation
+     * @param numPersons The number of persons in the simulation
      */
-    public Trace(int numTicks, int numPersons) {
-        populations = new ArrayList<>(numTicks + 1);
-        for (int i = 0; i <= numTicks; i++) {
+    public Trace(int ticksNum, int numPersons) {
+        populations = new ArrayList<>(ticksNum + 1);
+        for (int i = 0; i <= ticksNum; i++) {
             populations.add(new PersonInfo[numPersons]);
         }
     }
@@ -35,15 +35,16 @@ public class Trace implements Population {
     }
 
     @Override
+    public List<PersonInfo[]> getPop() {
+        return populations;
+    }
+    
+    @Override
     public void addPopStat(List<Person> population, Query query, int tick) {
         throw new UnsupportedOperationException("Unimplemented method 'addPopulationStat'");
     }
 
-    @Override
-    public List<PersonInfo[]> getPop() {
-        return populations;
-    }
-
+    
     @Override
     public Map<Query, Per_tick[]> getStats() {
         throw new UnsupportedOperationException("Unimplemented method 'getStats'");

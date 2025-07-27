@@ -138,16 +138,27 @@ public class Rocket implements Simulation
         int R = scenario.getParameters().getInfectionRadius(); // infection radius
 
         int distance = 2 + R;
-        
-            if (distance > badding) return 0;
+        if (distance > badding)
+            return 0;
 
-            int cycleDist = 2*T + R;
-            int fullCycles = (badding - distance) / cycleDist;
+        int tick = 1;
+        int timeSinceInfectious = 1;
 
-            int rem = badding - (distance + fullCycles*cycleDist);
-            int r = Math.min(T, rem/2 + 1);
+        while (distance <= badding) {
+            if (timeSinceInfectious == T) {
+                distance += 2 + R;
+                timeSinceInfectious = 1;
+            } else {
+                distance += 2;
+                timeSinceInfectious++;
+            }
 
-            return 1 + fullCycles*T + r;
+            if (distance > badding)
+                break;
+            tick++;
+        }
+        //System.out.println("Tick is caclculated");
+        return tick;
     }
 
     private void initializeStatistics() {

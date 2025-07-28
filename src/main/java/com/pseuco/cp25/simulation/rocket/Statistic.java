@@ -66,6 +66,8 @@ public class Statistic implements Population {
     
     public Statistic(int ticksNum, Collection<Query> queries) {
         this.stats = new HashMap<>(queries.size());
+        
+        
         for (Query query : queries) {
             Per_tick[] per_ticks = new Per_tick[ticksNum + 1];
             for (int i = 0; i <= ticksNum; i++) {
@@ -78,14 +80,21 @@ public class Statistic implements Population {
     @Override
     public synchronized void addPopStat(List<Person> population, Query query, int tick) {
         for (Person person : population) {
-            if (person.isSusceptible()) {
+            if (person.isSusceptible()) 
+            {
                 stats.get(query)[tick].addSus();
-            } else if (person.isInfected()) {
-                stats.get(query)[tick].addInf();
-            } else if (person.isInfectious()) {
+            } 
+            else if (person.isInfectious()) 
+            {
                 stats.get(query)[tick].addInfectious();
-            } else {
+            } 
+            else if (person.isRecovered()) 
+            {
                 stats.get(query)[tick].addRecov();
+            } 
+            else 
+            {
+                stats.get(query)[tick].addInf();
             }
         }
     }

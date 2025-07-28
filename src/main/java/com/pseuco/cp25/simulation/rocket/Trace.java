@@ -27,6 +27,7 @@ public class Trace implements Population {
         }
     }
 
+
     @Override
     public synchronized void addPop(List<Person> population, int tick) {
         for (Person person : population) {
@@ -38,6 +39,7 @@ public class Trace implements Population {
     public List<PersonInfo[]> getPop() {
         return populations;
     }
+    
     
     @Override
     public void addPopStat(List<Person> population, Query query, int tick) {

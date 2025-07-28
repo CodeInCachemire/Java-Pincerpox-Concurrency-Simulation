@@ -10,34 +10,33 @@ import com.pseuco.cp25.simulation.rocket.Statistic.Per_tick;
 
 public interface Population {
     /**
-     * Used to receive a population from some patch and converting it into an output.
-     * 
-     * @param population The current population of some patch
-     * @param tick       The current tick
+     * Adds population trace for a specific tick.
+     * @param population
+     * @param tick
      */
     public void addPop(List<Person> population, int tick);
 
     /**
-     * Used to receive a population from some patch and converting it into an output.
-     * In the case of not wanting a trace
+     * Adds population statistics for a specific query and tick.
      * 
-     * @param population The population of the given query
-     * @param query      Some query
-     * @param tick       The current tick
+     * @param population The population to add statistics for
+     * @param query      The query for which the statistics are collected
+     * @param tick       The current tick in the simulation
      */
     public void addPopStat(List<Person> population, Query query, int tick);
 
     /**
-     * Returns all populations of the whole grid for each tick.
+     * Returns the population trace for each tick.
      * 
-     * @return List of all populations per tick
+     * @return A list of PersonInfo arrays, where each array corresponds to a tick
      */
     public List<PersonInfo[]> getPop();
 
     /**
-     * Returns all necessary numbers per tick to use when no trace is asked for.
+     * Returns the statistics for each query.
      * 
-     * @return A map from some query to its corresponding list of statistics per tick
+     * @return A map where the key is a Query and the value is an array of Per_tick
+     *         objects containing statistics for that query
      */
     public Map<Query, Per_tick[]> getStats();
 

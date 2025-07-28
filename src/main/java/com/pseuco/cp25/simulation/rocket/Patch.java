@@ -7,6 +7,7 @@ import com.pseuco.cp25.model.Rectangle;
 import com.pseuco.cp25.model.XY;
 import com.pseuco.cp25.simulation.common.Context;
 import com.pseuco.cp25.simulation.common.Person;
+
 import com.pseuco.cp25.validator.Validator;
 
 

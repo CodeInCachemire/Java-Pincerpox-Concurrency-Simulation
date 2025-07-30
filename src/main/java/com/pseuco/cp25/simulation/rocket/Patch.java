@@ -295,8 +295,9 @@ public class Patch implements Runnable, Context {
         }else {
             for(Query query : this.queries){
                 List<Person> peopleInQuery = new ArrayList<>();
+                Rectangle area = query.getArea();
                 for (Person person :population){
-                    if(query.getArea().contains(person.getPosition()))
+                    if(area.contains(person.getPosition()))
                     peopleInQuery.add(person);
                 }
 

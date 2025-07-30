@@ -82,6 +82,7 @@ public class Rocket implements Simulation
 @Override
     public void run() 
     {
+        //long start = System.nanoTime();
         //call threads here incomplete noww
         //threads(output);
         //THREADS FUNC
@@ -97,9 +98,10 @@ public class Rocket implements Simulation
             for (PersonInfo[] gtrace : output.getPop()) {
                 for (Map.Entry<String, Query> entry : scenario.getQueries().entrySet()) {
                     final Query query = entry.getValue();
+                    final Rectangle area = query.getArea();
                     long sus = 0, inf = 0, infe = 0, rec = 0;
                     for (PersonInfo info : gtrace) {
-                        if (query.getArea().contains(info.getPosition())) {
+                        if (area.contains(info.getPosition())) {
                             switch (info.getInfectionState().getState()) {
                                 case SUSCEPTIBLE -> sus++;
                                 case INFECTED    -> inf++;
@@ -128,7 +130,10 @@ public class Rocket implements Simulation
                 }
             }
         }
-            
+
+        /*long end = System.nanoTime();
+        double durationMs = (end - start) / 1_000_000.0;
+        System.out.printf("Simulation run() took %.2f ms%n", durationMs);    */ 
     }
 
     private int infectionUncertainity() 
@@ -172,67 +177,62 @@ public class Rocket implements Simulation
 
     private void threads(Population output)
     {
-        //THREAD stuff
-       
-        List<Patch> patchList = new ArrayList<>();
-
+        List<Rectangle> patchAreasList = new ArrayList<>();
         Iterator<Rectangle> patchAreas = Utils.getPatches(scenario);
-        int patchId = 0;
-
         while (patchAreas.hasNext()) {
-            Rectangle patchArea = patchAreas.next(); // get za patch
+            patchAreasList.add(patchAreas.next());
+        }
+
+        List<Patch> patchList = new ArrayList<>();
+        int patchId = 0;
+        XY BR = scenario.getGrid().getBottomRight();
+
+        // Step 1: Construct each patch using the stored rectangles
+        for (Rectangle patchArea : patchAreasList) {
             XY TL1 = patchArea.getTopLeft(); // top left corner of the patch starting point
             XY TL2 = TL1.sub(badding); // now add padding to the core of the patch
-            XY BR = scenario.getGrid().getBottomRight(); // now find the bottom right corner of the grid
             XY TL3 = TL2.limit(XY.ZERO, BR); // limit the top left corner to the grid size
             XY sizeOfPatch = patchArea.getBottomRight().add(badding).limit(XY.ZERO, BR).sub(TL3);
             Rectangle paddingArea = new Rectangle(TL3, sizeOfPatch); // now create the padding area
 
             Patch patch = new Patch(
-                    patchId, 
-                    scenario.getTicks(),
-                    cycleOfTicks,
-                    scenario.getParameters(), 
-                    scenario.getGrid(), 
-                    patchArea, 
-                    paddingArea, 
-                    scenario.getObstacles(), 
-                    scenario.getQueries(), 
-                    scenario.getPopulation(), 
-                    validator, 
-                    output , 
-                    scenario.getTrace()
-                    );
+                patchId,
+                scenario.getTicks(),
+                cycleOfTicks,
+                scenario.getParameters(),
+                scenario.getGrid(),
+                patchArea,
+                paddingArea,
+                scenario.getObstacles(),
+                scenario.getQueries(),
+                scenario.getPopulation(),
+                validator,
+                output ,
+                scenario.getTrace()
+            );
             patchList.add(patch); // add the patch to the list of patches
             patchId++;
         }
 
         for (int i = 0; i < patchList.size(); i++) {
             Patch patchOne = patchList.get(i);
-            Iterator<Rectangle> otherPatch = Utils.getPatches(scenario);
-            int otherPatchId = -1;
+            Rectangle patchOneArea = patchAreasList.get(i);
 
-            while (otherPatch.hasNext()) {
-                Rectangle otherArea = otherPatch.next();
-                otherPatchId++;
-                if (i == otherPatchId) {
-                    continue; // skip the patch itself
+            for (int j = 0; j < patchList.size(); j++) {
+                if (i == j) continue;
+
+                Patch patchTwo = patchList.get(j);
+                Rectangle patchTwoArea = patchAreasList.get(j);
+
+                if (patchOne.getBaddingArea().overlaps(patchTwoArea) &&
+                    mayPropagateFrom(scenario, patchOneArea, patchTwoArea)) {
+                    patchOne.addNeighborToPatch(patchTwo);
                 }
-
-                Patch patchTwoID = patchList.get(otherPatchId);
-                if (patchOne.getBaddingArea().overlaps(otherArea)
-                        && mayPropagateFrom(scenario, patchOne.getArea(), otherArea)) {
-                    patchOne.addNeighborToPatch(patchTwoID); //add nieghbor patfch to our neighbiur patches
-                }
-
             }
-
         }
-        
+
         startAndJoinThreads(patchList);
-        //Initialize neighbourds logic 
-
-
+        //Initialize neighbourds logic
     }
 
     private void startAndJoinThreads(List<Patch> patchList){
